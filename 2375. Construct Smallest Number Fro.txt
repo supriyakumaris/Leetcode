@@ -1,0 +1,172 @@
+2375. Construct Smallest Number From DI String
+
+c++
+
+class Solution {
+public:
+    // Check if the current sequence matches the pattern of 'I' and 'D'
+    bool check(string &sequence, string &pattern) {
+        for (int patternIndex = 0; patternIndex < pattern.size();
+             patternIndex++) {
+            if (pattern[patternIndex] == 'I') {
+                // Ensure the sequence is in increasing order at 'I' positions
+                if (sequence[patternIndex] > sequence[patternIndex + 1])
+                    return false;
+            } else {
+                // Ensure the sequence is in decreasing order at 'D' positions
+                if (sequence[patternIndex] < sequence[patternIndex + 1])
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    string smallestNumber(string pattern) {
+        int patternLength = pattern.size();
+        string sequence = "";
+
+        // Create a sequence of numbers from 1 to n+1
+        for (int number = 1; number <= 1 + patternLength; number++) {
+            sequence.push_back(number + '0');
+        }
+
+        string permutation = sequence;
+
+        // Keep finding the next permutation until it matches the pattern
+        while (!check(permutation, pattern)) {
+            next_permutation(permutation.begin(), permutation.end());
+        }
+
+        return permutation;
+    }
+};
+
+##############################################################################################################
+
+
+JAVA
+
+class Solution {
+
+    // Check if the current sequence matches the pattern of 'I' and 'D'
+    private boolean check(String sequence, String pattern) {
+        for (int index = 0; index < pattern.length(); index++) {
+            if (pattern.charAt(index) == 'I') {
+                // Ensure the sequence is in increasing order at 'I' positions
+                if (sequence.charAt(index) > sequence.charAt(index + 1)) {
+                    return false;
+                }
+            } else {
+                // Ensure the sequence is in decreasing order at 'D' positions
+                if (sequence.charAt(index) < sequence.charAt(index + 1)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public String smallestNumber(String pattern) {
+        int patternLength = pattern.length();
+        char[] numberSequence = new char[patternLength + 1];
+
+        // Create a sequence of numbers from '1' to 'n+1'
+        for (int position = 0; position <= patternLength; position++) {
+            numberSequence[position] = (char) ('1' + position);
+        }
+
+        // Generate permutations and check for the correct pattern
+        while (!check(new String(numberSequence), pattern)) {
+            if (!findNextPermutation(numberSequence)) {
+                break;
+            }
+        }
+
+        return new String(numberSequence);
+    }
+
+    // Custom implementation of the next permutation function
+    private boolean findNextPermutation(char[] numberSequence) {
+        int lastIncreasingIndex = numberSequence.length - 2;
+
+        // Find the rightmost character smaller than its next character
+        while (
+            lastIncreasingIndex >= 0 &&
+            numberSequence[lastIncreasingIndex] >=
+            numberSequence[lastIncreasingIndex + 1]
+        ) {
+            lastIncreasingIndex--;
+        }
+        if (lastIncreasingIndex == -1) return false;
+
+        // Find the rightmost character greater than numberSequence[lastIncreasingIndex]
+        // and swap
+        int swapIndex = numberSequence.length - 1;
+        while (
+            numberSequence[swapIndex] <= numberSequence[lastIncreasingIndex]
+        ) {
+            swapIndex--;
+        }
+        swapCharacters(numberSequence, lastIncreasingIndex, swapIndex);
+
+        // Reverse the suffix to get the next lexicographically smallest permutation
+        reverseSuffix(
+            numberSequence,
+            lastIncreasingIndex + 1,
+            numberSequence.length - 1
+        );
+        return true;
+    }
+
+    private void swapCharacters(char[] array, int firstIdx, int secondIdx) {
+        char temp = array[firstIdx];
+        array[firstIdx] = array[secondIdx];
+        array[secondIdx] = temp;
+    }
+
+    private void reverseSuffix(char[] array, int startIdx, int endIdx) {
+        while (startIdx < endIdx) {
+            swapCharacters(array, startIdx, endIdx);
+            startIdx++;
+            endIdx--;
+        }
+    }
+}
+
+###############################################################################################################
+
+python
+
+
+class Solution:
+    # Check if the current sequence matches the pattern of 'I' and 'D'
+    def check(self, number_sequence: str, pattern: str) -> bool:
+        for index in range(len(pattern)):
+            # Ensure the sequence is in increasing order at 'I' positions
+            if (
+                pattern[index] == "I"
+                and number_sequence[index] > number_sequence[index + 1]
+            ):
+                return False
+            # Ensure the sequence is in decreasing order at 'D' positions
+            elif (
+                pattern[index] == "D"
+                and number_sequence[index] < number_sequence[index + 1]
+            ):
+                return False
+        return True
+
+    def smallestNumber(self, pattern: str) -> str:
+        pattern_length = len(pattern)
+
+        # Generate sequence "123...n+1"
+        number_sequence = "".join(
+            str(num) for num in range(1, pattern_length + 2)
+        )
+
+        # Use permutations generator
+        for permutation in permutations(number_sequence):
+            permutation_str = "".join(permutation)
+            if self.check(permutation_str, pattern):
+                return permutation_str
+        return ""
